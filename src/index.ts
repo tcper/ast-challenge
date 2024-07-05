@@ -1,3 +1,195 @@
-export default () => {
+import * as ts from 'typescript';
 
+export default input => {
+  const {
+    requestType,
+    responseType,
+    interfaceName = 'UsePoolsQuery',
+    queryServiceName = 'queryService',
+    queryServiceFunction = 'pools',
+    keyName = 'poolsQuery',
+  } = input;
+
+  const factory = ts.factory;
+  const lines = [
+    factory.createInterfaceDeclaration(
+      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+      factory.createIdentifier(interfaceName),
+      [
+        factory.createTypeParameterDeclaration(
+          undefined,
+          factory.createIdentifier('TData'),
+          undefined,
+          undefined
+        ),
+      ],
+      [
+        factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
+          factory.createExpressionWithTypeArguments(
+            factory.createIdentifier('ReactQueryParams'),
+            [
+              factory.createTypeReferenceNode(
+                factory.createIdentifier(responseType),
+                undefined
+              ),
+              factory.createTypeReferenceNode(
+                factory.createIdentifier('TData'),
+                undefined
+              ),
+            ]
+          ),
+        ]),
+      ],
+      [
+        factory.createPropertySignature(
+          undefined,
+          factory.createIdentifier('request'),
+          factory.createToken(ts.SyntaxKind.QuestionToken),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier(requestType),
+            undefined
+          )
+        ),
+      ]
+    ),
+    factory.createVariableStatement(
+      undefined,
+      factory.createVariableDeclarationList(
+        [
+          factory.createVariableDeclaration(
+            factory.createIdentifier('usePools'),
+            undefined,
+            undefined,
+            factory.createArrowFunction(
+              undefined,
+              [
+                factory.createTypeParameterDeclaration(
+                  undefined,
+                  factory.createIdentifier('TData'),
+                  undefined,
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier(responseType),
+                    undefined
+                  )
+                ),
+              ],
+              [
+                factory.createParameterDeclaration(
+                  undefined,
+                  undefined,
+                  factory.createObjectBindingPattern([
+                    factory.createBindingElement(
+                      undefined,
+                      undefined,
+                      factory.createIdentifier('request'),
+                      undefined
+                    ),
+                    factory.createBindingElement(
+                      undefined,
+                      undefined,
+                      factory.createIdentifier('options'),
+                      undefined
+                    ),
+                  ]),
+                  undefined,
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('UsePoolsQuery'),
+                    [
+                      factory.createTypeReferenceNode(
+                        factory.createIdentifier('TData'),
+                        undefined
+                      ),
+                    ]
+                  ),
+                  undefined
+                ),
+              ],
+              undefined,
+              factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+              factory.createBlock(
+                [
+                  factory.createReturnStatement(
+                    factory.createCallExpression(
+                      factory.createIdentifier('useQuery'),
+                      [
+                        factory.createTypeReferenceNode(
+                          factory.createIdentifier(responseType),
+                          undefined
+                        ),
+                        factory.createTypeReferenceNode(
+                          factory.createIdentifier('Error'),
+                          undefined
+                        ),
+                        factory.createTypeReferenceNode(
+                          factory.createIdentifier('TData'),
+                          undefined
+                        ),
+                      ],
+                      [
+                        factory.createArrayLiteralExpression(
+                          [
+                            factory.createStringLiteral(keyName),
+                            factory.createIdentifier('request'),
+                          ],
+                          false
+                        ),
+                        factory.createArrowFunction(
+                          undefined,
+                          undefined,
+                          [],
+                          undefined,
+                          factory.createToken(
+                            ts.SyntaxKind.EqualsGreaterThanToken
+                          ),
+                          factory.createBlock(
+                            [
+                              factory.createIfStatement(
+                                factory.createPrefixUnaryExpression(
+                                  ts.SyntaxKind.ExclamationToken,
+                                  factory.createIdentifier(queryServiceName)
+                                ),
+                                factory.createThrowStatement(
+                                  factory.createNewExpression(
+                                    factory.createIdentifier('Error'),
+                                    undefined,
+                                    [
+                                      factory.createStringLiteral(
+                                        'Query Service not initialized'
+                                      ),
+                                    ]
+                                  )
+                                ),
+                                undefined
+                              ),
+                              factory.createReturnStatement(
+                                factory.createCallExpression(
+                                  factory.createPropertyAccessExpression(
+                                    factory.createIdentifier(queryServiceName),
+                                    factory.createIdentifier(
+                                      queryServiceFunction
+                                    )
+                                  ),
+                                  undefined,
+                                  [factory.createIdentifier('request')]
+                                )
+                              ),
+                            ],
+                            true
+                          )
+                        ),
+                        factory.createIdentifier('options'),
+                      ]
+                    )
+                  ),
+                ],
+                true
+              )
+            )
+          ),
+        ],
+        ts.NodeFlags.Const | ts.NodeFlags.Constant | ts.NodeFlags.Constant
+      )
+    ),
+  ];
+  return lines;
 };
